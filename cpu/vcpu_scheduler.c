@@ -25,17 +25,17 @@ int main(int argc, char *argv[])
         printf("Failed to Connect to the Hypervisor");
     }
 
-    virNodeGetInfo(conn, &nodeInfo)
+    virNodeGetInfo(conn, &nodeInfo);
     int pCpu = (int) nodeInfo.cpu;
     printf("Number of pCpus: %d\n", pCpu);
 
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
     int curP = 0;
-    for (int i = 0, i < numDomains; i ++)
+    for (int i = 0; i < numDomains; i ++)
     {
         curP %= pCpu;
-        virDomainPinVcpu(domains[i], i, curP);
-        printf("vCpu %d Pinned to pCpu %d", i, curP, pCpu);
+        virDomainPinVcpu(domains[i], i, curP, pCpu);
+        printf("vCpu %d Pinned to pCpu %d", i, curP);
         curP += 1;
     }
 }
