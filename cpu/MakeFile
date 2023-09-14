@@ -1,5 +1,5 @@
-CC=gcc
-LIBS = -lvirt
+CC=gcc 
+CFLAG=-I. -lvirt
 OBJ = vcpu_scheduler.o
 
 %.o: %.c
