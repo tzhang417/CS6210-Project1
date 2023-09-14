@@ -1,0 +1,10 @@
+CC=gcc
+CFLAGS=-I
+LIBS = -lvirt
+OBJ = vcpu_scheduler.o
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+vcpu_scheduler: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
