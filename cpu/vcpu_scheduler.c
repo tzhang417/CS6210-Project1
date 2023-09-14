@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
     virNodeInfo nodeInfo;
     virConnectPtr conn;
-    virDomainPtr domains;
+    virDomainPtr *domains;
     if (argc < 2)
     {
         printf("Invalid Command\n");
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     }
 
     virNodeGetInfo(conn, &nodeInfo);
-    int pCpu = (int) nodeInfo.cpu;
+    int pCpu = (int) nodeInfo.cpus;
     printf("Number of pCpus: %d\n", pCpu);
 
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
