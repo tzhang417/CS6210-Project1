@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     }
 
     int interval = atoi(argv[1]);
-    if (sleep <= 0) 
+    if (interval <= 0) 
     {
         printf("Invalid Interval\n");
         return -1;
@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
         printf("Failed to Connect to the Hypervisor");
     }
 
-    node = virNodeGetInfo(conn, &nodeInfo);
-    int pCpu = (int) node_info.cpu;
+    virNodeGetInfo(conn, &nodeInfo)
+    int pCpu = (int) nodeInfo.cpu;
     printf("Number of pCpus: %d\n", pCpu);
 
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     {
         curP %= pCpu;
         virDomainPinVcpu(domains[i], i, curP);
-        printf("vCpu %d Pinned to pCpu %d", i, curP);
+        printf("vCpu %d Pinned to pCpu %d", i, curP, pCpu);
         curP += 1;
     }
 }
