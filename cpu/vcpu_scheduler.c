@@ -30,12 +30,12 @@ int main(int argc, char *argv[])
     printf("Number of pCpus: %d\n", pCpu);
 
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
-    int curP = 0；
+    int curP = 0;
     for (int i = 0, i < numDomains; i ++)
     {
         curP %= pCpu;
-        virDomainPinVcpu(domains[i], i, curP)；
-        printf("vCpu %d Pinned to pCpu %d", i, curP)；
-        curP += 1；
+        virDomainPinVcpu(domains[i], i, curP);
+        printf("vCpu %d Pinned to pCpu %d", i, curP);
+        curP += 1;
     }
 }
