@@ -1,6 +1,6 @@
 CC=gcc 
-CFLAG=-I. -lvirt
-OBJ = vcpu_scheduler.o
+CFLAG=-I. -lvirt -Wno-implicit-function-declaration
+OBJ=vcpu_scheduler.o
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
