@@ -71,12 +71,18 @@ void CPUScheduler(virConnectPtr conn, int interval)
     printf("Number of pCpus: %d\n", pCpu);
 
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
-    int curP = 0;
+    unsigned char cpuMap = 0x01;
     for (int i = 0; i < numDomains; i++)
     {
-        curP %= pCpu;
-        virDomainPinVcpu(domains[i], i, curP, pCpu);
-        printf("vCpu %d Pinned to pCpu %d", i, curP);
-        curP += 1;
+        virDomainPinVcpu(domains[i], i, &cpuMap, pCpu);
+        printf("vCpu %d Pinned to pCpu %d\n", i, cpuMap);
+        if ((cpuMap << 1) >= (1 << pCpu))
+        {
+            cpuMap = 0x01;
+        }
+        else
+        {
+            cpuMap <<= 1;
+        }
     }
 }
