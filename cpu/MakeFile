@@ -1,9 +1,7 @@
-CC=gcc 
-CFLAG=-I. -lvirt -Wno-implicit-function-declaration
-OBJ=vcpu_scheduler.o
+all: compile
 
-%.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+compile:
+	gcc -g -Wall vcpu_scheduler.c -o vcpu_scheduler -lvirt -lm
 
-vcpu_scheduler: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+clean:
+	rm vcpu_scheduler
