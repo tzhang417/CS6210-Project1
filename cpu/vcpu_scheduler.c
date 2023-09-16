@@ -75,7 +75,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
     unsigned char cpuMap = 0x01;
     for (int i = 0; i < numDomains; i++)
     {
-        virDomainPinVcpu(domains[i], 0, &cpuMap, pCpu);
+        virDomainPinVcpu(domains[i], 0, &cpuMap, VIR_CPU_MAPLEN(nodeinfo.cpus));
         printf("vCpu %d Pinned to pCpu %d\n", i, cpuMap);
         if ((cpuMap << 1) >= (1 << pCpu))
         {
