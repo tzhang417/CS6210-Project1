@@ -71,7 +71,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
     printf("Number of pCpus: %d\n", pCpu);
 
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
-    print("Number of domains: %d\n", numDomains)
+    print("Number of domains: %d\n", numDomains);
     unsigned char cpuMap = 0x01;
     for (int i = 0; i < numDomains; i++)
     {
