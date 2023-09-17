@@ -87,13 +87,20 @@ void CPUScheduler(virConnectPtr conn, int interval)
         }
     }
 
-    getPercentage(domains, numDomains, interval)
+    getPercentage(domains, numDomains, interval);
+
+
+    virConnectClose(conn);
 }
 
 void getPercentage(virDomainPtr *domains, int numDomains, int interval)
 {
     virTypedParameterPtr *params;
     int nparams;
-    virDomainGetCPUStats(domain, &params, &nparams, -1 ,1, 0);
-    printf("%d\n", nparams);
+    virDomainGetCPUStats(domains[0], &params, &nparams, -1 ,1, 0);
+    for (i = 0; i < nparams; i++) 
+    {
+    printf("Parameter: %s, Value: %lld\n", params[i].field, params[i].value.l);
+    }
+    free(params);
 }
