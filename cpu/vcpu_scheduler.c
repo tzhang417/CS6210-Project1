@@ -89,7 +89,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
         }
     }
 
-    double *cpuPercentage = calloc(pCpu, sizeof(int));
+    double *cpuPercentage = calloc(pCpu, sizeof(double));
     getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
     for (int i = 0; i < pCpu; i++)
     {
@@ -116,6 +116,6 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     for (int i = 0; i < numDomains; i++)
     {
         virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-        cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000UL);
+        cpuPercentage[domainToCpu[i]] += (100.0 * (params[0].value.l - prevCpuTime[i]))/(interval * 1000000000UL);
     }
 }
