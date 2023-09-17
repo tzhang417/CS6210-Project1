@@ -108,6 +108,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     {
         virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
         prevCpuTime[i] = params[0].value.l;
+        printf("%lld", params[0].value.l);
         printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
     }
     
