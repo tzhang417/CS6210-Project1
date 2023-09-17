@@ -73,9 +73,11 @@ void CPUScheduler(virConnectPtr conn, int interval)
     int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
     printf("Number of domains: %d\n", numDomains);
     unsigned char cpuMap = 0x01;
+    int *domainToCpu = calloc(numDomains, sizeof(int));
     for (int i = 0; i < numDomains; i++)
     {
         virDomainPinVcpu(domains[i], 0, &cpuMap, VIR_CPU_MAPLEN(nodeInfo.cpus));
+        domainToCpu[i] = i % numDomains;
         printf("vCpu %d Pinned to pCpu %d\n", i, cpuMap);
         if ((cpuMap << 1) >= (1 << pCpu))
         {
@@ -87,20 +89,45 @@ void CPUScheduler(virConnectPtr conn, int interval)
         }
     }
 
-    getPercentage(domains, numDomains, interval);
+    double *cpuPercentage = calloc(pCpu, sizeof(double));
+    getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
+    sleep(interval);
 
+    getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
+    for (int i = 0; i < pCpu; i++)
+    {
+        printf("%d CPU's usage is %f\n"cpuPercentage[i]);
+    }
 
     virConnectClose(conn);
 }
 
-void getPercentage(virDomainPtr *domains, int numDomains, int interval)
+void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage, int *domainToCpu, int interval)
 {
+    static int time = 0;
     int nparams = 1;
-    for (int i = 0; i < numDomains; i++)
+    static unsigned long long prevCpuTime[numDomains];
+    if (time == 0)
+    {   
+        for (int i = 0; i < numDomains; i++)
+        {
+            virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
+            virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
+            prevCpuTime[i] = params[0].value.l;
+            printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
+            free(params);
+        }
+    }
+    else
     {
-        virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
-        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-        printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
-        free(params);
+
+        for (int i = 0; i < numDomains; i++)
+        {
+            virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
+            virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
+            cpuPercentage[domainToCpu[i]] += 100 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000UL);
+            prevCpuTime[i] = params[0].value.l;
+            free(params);
+        }
     }
 }
