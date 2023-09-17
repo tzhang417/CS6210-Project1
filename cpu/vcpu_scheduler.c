@@ -86,4 +86,14 @@ void CPUScheduler(virConnectPtr conn, int interval)
             cpuMap <<= 1;
         }
     }
+
+    getPercentage(domains, numDomains, interval)
+}
+
+void getPercentage(virDomainPtr *domains, int numDomains, int interval)
+{
+    virTypedParameterPtr *params;
+    int nparams;
+    virDomainGetCPUStats(domain, &params, &nparams, -1 ,1, 0);
+    printf("%d\n", nparams);
 }
