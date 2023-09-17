@@ -96,8 +96,6 @@ void CPUScheduler(virConnectPtr conn, int interval)
         printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
     }
 
-    free(domainToCpu);
-    free(cpuPercentage);
     virConnectClose(conn);
 }
 
