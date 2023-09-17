@@ -122,5 +122,5 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
         cpuPercentage[domainToCpu[i]] += 100 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000);
         free(params);
     }
-    printf("this is right")    
+    printf("this is right");
 }
