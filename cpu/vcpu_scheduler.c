@@ -105,19 +105,19 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
 {
     int nparams = 1;
     unsigned long long prevCpuTime[numDomains]; 
-    virTypedParameterPtr params;
+    virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
     {
-        virDomainGetCPUStats(domains[i], &params, nparams, -1 ,1, 0);
+        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
         prevCpuTime[i] = params[0].value.l;
         printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
     }
     
     sleep(interval);
-
+    virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
     {
-        virDomainGetCPUStats(domains[i], &params, nparams, -1 ,1, 0);
+        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
         printf("%lld", params[0].value.l - prevCpuTime[i]);
         cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000);
     }
