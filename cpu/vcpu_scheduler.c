@@ -91,9 +91,6 @@ void CPUScheduler(virConnectPtr conn, int interval)
 
     double *cpuPercentage = calloc(pCpu, sizeof(double));
     getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
-    sleep(interval);
-
-    getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
     for (int i = 0; i < pCpu; i++)
     {
         printf("%d CPU's usage is %f\n", i, cpuPercentage[i]);
@@ -106,28 +103,23 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
 {
     static int time = 0;
     int nparams = 1;
-    static unsigned long long prevCpuTime[numDomains];
-    if (time == 0)
-    {   
-        for (int i = 0; i < numDomains; i++)
-        {
-            virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
-            virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-            prevCpuTime[i] = params[0].value.l;
-            printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
-            free(params);
-        }
-        time = 1;
-    }
-    else
+    unsigned long long prevCpuTime[numDomains]; 
+    for (int i = 0; i < numDomains; i++)
     {
-        for (int i = 0; i < numDomains; i++)
-        {
-            virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
-            virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-            cpuPercentage[domainToCpu[i]] += 100 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000UL);
-            prevCpuTime[i] = params[0].value.l;
-            free(params);
-        }
+        virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
+        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
+        prevCpuTime[i] = params[0].value.l;
+        printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
+        free(params);
     }
+    
+    sleep(interval);
+
+    for (int i = 0; i < numDomains; i++)
+    {
+        virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
+        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
+        cpuPercentage[domainToCpu[i]] += 100 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000UL);            prevCpuTime[i] = params[0].value.l;
+        free(params);
+    }    
 }
