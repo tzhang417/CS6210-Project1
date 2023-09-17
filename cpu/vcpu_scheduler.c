@@ -106,7 +106,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
 {
     static int time = 0;
     int nparams = 1;
-    static unsigned long long prevCpuTime[numDomains] = {0};
+    static unsigned long long prevCpuTime[numDomains];
     if (time == 0)
     {   
         for (int i = 0; i < numDomains; i++)
@@ -121,7 +121,6 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     }
     else
     {
-
         for (int i = 0; i < numDomains; i++)
         {
             virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
