@@ -114,7 +114,6 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     }
     
     sleep(interval);
-    virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
     {
         virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
