@@ -95,12 +95,12 @@ void CPUScheduler(virConnectPtr conn, int interval)
 
 void getPercentage(virDomainPtr *domains, int numDomains, int interval)
 {
-    int nparams = 2;
-    virTypedParameterPtr params = calloc(nparams, sizeof(virTypedParameter));
-    virDomainGetCPUStats(domains[0], params, nparams, -1 ,1, 0);
-    for (int i = 0; i < nparams; i++) 
+    int nparams = 1;
+    for (int i = 0; i < numDomains; i++)
     {
-    printf("Parameter: %s, Value: %lld\n", params[i].field, params[i].value.l);
+        virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
+        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
+        printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
+        free(params);
     }
-    free(params);
 }
