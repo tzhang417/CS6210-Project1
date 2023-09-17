@@ -112,6 +112,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     }
     
     sleep(interval);
+    printf("%d", interval)
     
     for (int i = 0; i < numDomains; i++)
     {
