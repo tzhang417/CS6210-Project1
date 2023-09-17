@@ -98,7 +98,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, int interval)
     virTypedParameterPtr *params;
     int nparams;
     virDomainGetCPUStats(domains[0], &params, &nparams, -1 ,1, 0);
-    for (i = 0; i < nparams; i++) 
+    for (int i = 0; i < nparams; i++) 
     {
     printf("Parameter: %s, Value: %lld\n", params[i].field, params[i].value.l);
     }
