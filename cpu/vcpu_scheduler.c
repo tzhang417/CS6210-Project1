@@ -96,6 +96,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
         printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
     }
 
+    free(domainToCpu);
     virConnectClose(conn);
 }
 
@@ -120,5 +121,6 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
         virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
         cpuPercentage[domainToCpu[i]] += 100 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000);
         free(params);
-    }    
+    }
+    printf("this is right")    
 }
