@@ -118,7 +118,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     {
         virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
         virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-        cpuPercentage[domainToCpu[i]] += (100.0 * (params[0].value.l - prevCpuTime[i]))/(interval * 1000000000);
+        cpuPercentage[domainToCpu[i]] += 100 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000);
         free(params);
     }    
 }
