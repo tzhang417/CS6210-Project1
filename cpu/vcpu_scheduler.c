@@ -89,7 +89,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
         }
     }
 
-    double *cpuPercentage = calloc(pCpu, sizeof(double));
+    double *cpuPercentage = calloc(pCpu, sizeof(int));
     getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
     for (int i = 0; i < pCpu; i++)
     {
