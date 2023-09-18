@@ -137,7 +137,7 @@ int balanced(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains)
 {
     int maxCpu = 0;
     int minCpu = 0;
-    double threshold = 5.0;
+    double threshold = 10.0;
     for (int i = 1; i < pCpu; i++)
     {
         if (cpuPercentage[i] > cpuPercentage[maxCpu])
