@@ -96,9 +96,17 @@ void CPUScheduler(virConnectPtr conn, int interval)
         printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
     }
 
-    while (!balanced(cpuPercentage, pCpu))
+    while (!balanced(cpuPercentage, pCpu, domainToCpu, numDomains))
     {
         printf("Not Balanced\n");
+        getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
+        for (int i = 0; i < pCpu; i++)
+        {
+            printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
+        }
+        balance(cpuPercentage, pCpu, domainToCpu, numDomains, nodeInfo, domains);
+        
+        sleep(interval);
     }
     printf("Balanced!\n");
     virConnectClose(conn);
@@ -111,22 +119,21 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
     {
-        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
+        virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
         prevCpuTime[i] = params[0].value.l;
         printf("vCpu %d uses %lld cpu time\n", i, params[0].value.l);
     }
     
     sleep(interval);
-    printf("%d", interval);
     
     for (int i = 0; i < numDomains; i++)
     {
-        virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-        cpuPercentage[domainToCpu[i]] += (params[0].value.l - prevCpuTime[i])/(interval * 1000000000UL);
+        virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
+        cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l - prevCpuTime[i]) / (interval * 1000000000);
     }
 }
 
-int balanced(double *cpuPercentage, int pCpu)
+int balanced(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains)
 {
     int maxCpu = 0;
     int minCpu = 0;
@@ -145,9 +152,51 @@ int balanced(double *cpuPercentage, int pCpu)
     if (cpuPercentage[maxCpu] - cpuPercentage[minCpu] < threshold)
     {
         return 1;
-    }
+    } 
     else
     {
+        int count = 0;
+        for (int i = 0; i < numDomains; i++)
+        {
+            if (domainToCpu[i] == maxCpu)
+            {
+                count++;
+            }
+        }
+        if (count == 1)
+        {
+            return 1;
+        }
         return 0;
     }
+}
+
+void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, virNodeInfo nodeInfo, virDomainPtr *domains)
+{
+    int maxCpu = 0;
+    int minCpu = 0;
+    double threshold = 5.0;
+    for (int i = 1; i < pCpu; i++)
+    {
+        if (cpuPercentage[i] > cpuPercentage[maxCpu])
+        {
+            maxCpu = i;
+        }
+        if (cpuPercentage[i] < cpuPercentage[minCpu])
+        {
+            minCpu = i;
+        }
+    }
+
+    int domainToMove;
+    for (int i = 0; i < numDomains; i++)
+    {
+        if (domainToCpu[i] == maxCpu)
+        {
+            domainToMove = i;
+            break
+        }
+    }
+    unsigned char cpuMap = 1 << minCpu;
+    virDomainPinVcpu(domains[domainToMove], 0, &cpuMap, VIR_CPU_MAPLEN(nodeInfo.cpus));
 }
