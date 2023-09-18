@@ -194,6 +194,7 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
         if (domainToCpu[i] == maxCpu)
         {
             domainToMove = i;
+            domainToCpu[i] = minCpu;
             break;
         }
     }
