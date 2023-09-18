@@ -109,7 +109,6 @@ void CPUScheduler(virConnectPtr conn, int interval)
         sleep(interval);
     }
     printf("Balanced!\n");
-    virConnectClose(conn);
 }
 
 void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage, int *domainToCpu, int pCpu, int interval)
