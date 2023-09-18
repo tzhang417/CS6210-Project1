@@ -128,18 +128,18 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
 
 int balanced(double *cpuPercentage, int pCpu)
 {
-    int *maxCpu = 0;
-    int *minCpu = 0;
+    int maxCpu = 0;
+    int minCpu = 0;
     double threshold = 5.0;
     for (int i = 1; i < pCpu; i++)
     {
         if (cpuPercentage[i] > cpuPercentage[maxCpu])
         {
-            *maxCpu = i;
+            maxCpu = i;
         }
         if (cpuPercentage[i] < cpuPercentage[minCpu])
         {
-            *minCpu = i;
+            minCpu = i;
         }
     }
     if (cpuPercentage[maxCpu] - cpuPercentage[minCpu] < threshold)
