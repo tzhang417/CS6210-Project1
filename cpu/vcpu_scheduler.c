@@ -105,7 +105,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
             printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
         }
         balance(cpuPercentage, pCpu, domainToCpu, numDomains, nodeInfo, domains);
-        
+
         sleep(interval);
     }
     printf("Balanced!\n");
@@ -175,7 +175,6 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
 {
     int maxCpu = 0;
     int minCpu = 0;
-    double threshold = 5.0;
     for (int i = 1; i < pCpu; i++)
     {
         if (cpuPercentage[i] > cpuPercentage[maxCpu])
@@ -194,7 +193,7 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
         if (domainToCpu[i] == maxCpu)
         {
             domainToMove = i;
-            break
+            break;
         }
     }
     unsigned char cpuMap = 1 << minCpu;
