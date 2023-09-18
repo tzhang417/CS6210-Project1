@@ -96,6 +96,11 @@ void CPUScheduler(virConnectPtr conn, int interval)
         printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
     }
 
+    while (!balanced(cpuPercentage, pCpu))
+    {
+        printf("Not Balanced\n");
+    }
+    printf("Balanced!\n");
     virConnectClose(conn);
 }
 
@@ -117,6 +122,32 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     for (int i = 0; i < numDomains; i++)
     {
         virDomainGetCPUStats(domains[i], params, nparams, -1 ,1, 0);
-        cpuPercentage[domainToCpu[i]] += (100.0 * (params[0].value.l - prevCpuTime[i]))/(interval * 1000000000UL);
+        cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l - prevCpuTime[i])/(interval * 1000000000UL);
+    }
+}
+
+int balanced(double *cpuPercentage, int pCpu)
+{
+    int *maxCpu = 0;
+    int *minCpu = 0;
+    double threshold = 5.0;
+    for (int i = 1; i < pCpu; i++)
+    {
+        if (cpuPercentage[i] > cpuPercentage[maxCpu])
+        {
+            *maxCpu = i;
+        }
+        if (cpuPercentage[i] < cpuPercentage[minCpu])
+        {
+            *minCpu = i;
+        }
+    }
+    if (cpuPercentage[maxCpu] - cpuPercentage[minCpu] < threshold)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
     }
 }
