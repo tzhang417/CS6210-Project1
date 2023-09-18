@@ -158,7 +158,7 @@ int balanced(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains)
         int count = 0;
         for (int i = 0; i < numDomains; i++)
         {
-            printf("%d", domainToCpu[i])
+            printf("%d", domainToCpu[i]);
             if (domainToCpu[i] == maxCpu)
             {
                 count++;
