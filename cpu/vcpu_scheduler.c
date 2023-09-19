@@ -113,14 +113,14 @@ void CPUScheduler(virConnectPtr conn, int interval)
 
 void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage, int *domainToCpu, int pCpu, int interval)
 {
-    unsigned int prevCpuTime[numDomains]; 
+    unsigned long long prevCpuTime[numDomains]; 
     memset(cpuPercentage, 0, pCpu * sizeof(double));
     for (int i = 0; i < numDomains; i++)
     {
         virVcpuInfo info;
         virDomainGetVcpus(domains[i], &info, 1, NULL, 0);
         prevCpuTime[i] = info.cpuTime;
-        printf("vCpu %d uses %u cpu time\n", i, info.cpuTime);
+        printf("vCpu %d uses %llu cpu time\n", i, info.cpuTime);
     }
     
     sleep(interval);
