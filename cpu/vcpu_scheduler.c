@@ -195,7 +195,7 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
     {
         if (domainToCpu[i] == maxCpu)
         {
-            if (domainToMove = -1)
+            if (domainToMove == -1)
             {
                 domainToMove = i;
                 virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
