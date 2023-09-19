@@ -90,13 +90,13 @@ void CPUScheduler(virConnectPtr conn, int interval)
     }
 
     double *cpuPercentage = calloc(pCpu, sizeof(double));
-    getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
-    for (int i = 0; i < pCpu; i++)
-    {
-        printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
-    }
     while(1)
     {
+        getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
+        for (int i = 0; i < pCpu; i++)
+        {
+            printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
+        }
         if (balanced(cpuPercentage, pCpu, domainToCpu, numDomains))
         {
             printf("Balanced!\n");
@@ -104,11 +104,6 @@ void CPUScheduler(virConnectPtr conn, int interval)
         else
         {
             printf("Not Balanced\n");
-            getPercentage(domains, numDomains, cpuPercentage, domainToCpu, pCpu, interval);
-            for (int i = 0; i < pCpu; i++)
-            {
-                printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
-            }
             balance(cpuPercentage, pCpu, domainToCpu, numDomains, nodeInfo, domains);
         }
         sleep(interval);     
