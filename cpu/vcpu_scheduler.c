@@ -158,7 +158,6 @@ int balanced(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains)
         int count = 0;
         for (int i = 0; i < numDomains; i++)
         {
-            printf("%d", domainToCpu[i]);
             if (domainToCpu[i] == maxCpu)
             {
                 count++;
@@ -200,4 +199,5 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
     }
     unsigned char cpuMap = 1 << minCpu;
     virDomainPinVcpu(domains[domainToMove], 0, &cpuMap, VIR_CPU_MAPLEN(nodeInfo.cpus));
+    printf("vCpu %d Pinned to pCpu %d\n", i, cpuMap);
 }
