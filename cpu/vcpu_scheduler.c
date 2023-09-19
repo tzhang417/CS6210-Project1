@@ -199,5 +199,5 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
     }
     unsigned char cpuMap = 1 << minCpu;
     virDomainPinVcpu(domains[domainToMove], 0, &cpuMap, VIR_CPU_MAPLEN(nodeInfo.cpus));
-    printf("vCpu %d Pinned to pCpu %d\n", i, cpuMap);
+    printf("vCpu %d Pinned to pCpu %d\n", domainToMove, cpuMap);
 }
