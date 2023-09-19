@@ -129,7 +129,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     for (int i = 0; i < numDomains; i++)
     {
         virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
-        cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l- prevCpuTime[i]) / (interval * 1000000000);
+        cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l - prevCpuTime[i]) / (interval * 1000000000);
     }
 }
 
@@ -187,16 +187,32 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
         }
     }
 
-    int domainToMove;
+    int domainToMove = -1;
+    unsigned long long domainToMoveTime = -1;
+    int nparams = 1;
+    virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
     {
         if (domainToCpu[i] == maxCpu)
         {
-            domainToMove = i;
-            domainToCpu[i] = minCpu;
-            break;
+            if (domainToMove = -1)
+            {
+                domainToMove = i;
+                virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
+                domainToMoveTime = params[0].value.l;
+            }
+            else
+            {
+                virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
+                if (params[0].value.l < domainToMoveTime)
+                {
+                    domainToMove = i;
+                    domainToMoveTime = params[0].value.l;
+                }
+            }
         }
     }
+    domainToCpu[domainToMove] = minCpu;
     unsigned char cpuMap = 1 << minCpu;
     virDomainPinVcpu(domains[domainToMove], 0, &cpuMap, VIR_CPU_MAPLEN(nodeInfo.cpus));
     printf("vCpu %d Pinned to pCpu %d\n", domainToMove, cpuMap);
