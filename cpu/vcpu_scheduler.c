@@ -90,9 +90,10 @@ void CPUScheduler(virConnectPtr conn, int interval)
     }
 
     double *cpuPercentage = calloc(pCpu, sizeof(double));
+    double *domainPercentage = calloc(numDomains, sizeof(double));
     while(1)
     {
-        getPercentage(domains, numDomains, cpuPercentage, domainToCpu, pCpu, interval);
+        getPercentage(domains, numDomains, cpuPercentage, domainToCpu, pCpu, interval, domainPercentage);
         for (int i = 0; i < pCpu; i++)
         {
             printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
@@ -104,17 +105,18 @@ void CPUScheduler(virConnectPtr conn, int interval)
         else
         {
             printf("Not Balanced\n");
-            balance(cpuPercentage, pCpu, domainToCpu, numDomains, nodeInfo, domains);
+            balance(cpuPercentage, pCpu, domainToCpu, numDomains, nodeInfo, domains, domainPercentage);
         }
         sleep(interval);     
     }
 
 }
 
-void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage, int *domainToCpu, int pCpu, int interval)
+void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage, int *domainToCpu, int pCpu, int interval, double *domainPercentage)
 {
     unsigned long long prevCpuTime[numDomains]; 
     memset(cpuPercentage, 0, pCpu * sizeof(double));
+    memset(domainPercentage, 0, numDomains * sizeof(double));
     int nparams = 1;
     virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
@@ -130,6 +132,7 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     {
         virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
         cpuPercentage[domainToCpu[i]] += 100.0 * (params[0].value.l - prevCpuTime[i]) / (interval * 1000000000);
+        domainPercentage[i] = 100.0 * (params[0].value.l - prevCpuTime[i]) / (interval * 1000000000);
     }
 }
 
@@ -171,7 +174,7 @@ int balanced(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains)
     }
 }
 
-void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, virNodeInfo nodeInfo, virDomainPtr *domains)
+void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, virNodeInfo nodeInfo, virDomainPtr *domains, double *domainPercentage)
 {
     int maxCpu = 0;
     int minCpu = 0;
@@ -189,8 +192,6 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
 
     int domainToMove = -1;
     unsigned long long domainToMoveTime = -1;
-    int nparams = 1;
-    virTypedParameterPtr params = calloc(1, sizeof(virTypedParameter));
     for (int i = 0; i < numDomains; i++)
     {
         if (domainToCpu[i] == maxCpu)
@@ -198,18 +199,14 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
             if (domainToMove == -1)
             {
                 domainToMove = i;
-                virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
+                domainToMoveTime = domainPercentage[i];
+            }
+            else if (domainPercentage[i] < domainToMoveTime)
+            {
+                domainToMove = i;
                 domainToMoveTime = params[0].value.l;
             }
-            else
-            {
-                virDomainGetCPUStats(domains[i], params, nparams, -1, 1, 0);
-                if (params[0].value.l < domainToMoveTime)
-                {
-                    domainToMove = i;
-                    domainToMoveTime = params[0].value.l;
-                }
-            }
+            
         }
     }
     domainToCpu[domainToMove] = minCpu;
