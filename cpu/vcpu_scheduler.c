@@ -204,7 +204,7 @@ void balance(double *cpuPercentage, int pCpu, int *domainToCpu, int numDomains, 
             else if (domainPercentage[i] < domainToMoveTime)
             {
                 domainToMove = i;
-                domainToMoveTime = params[0].value.l;
+                domainToMoveTime = domainPercentage[i];
             }
             
         }
