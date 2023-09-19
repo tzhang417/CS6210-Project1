@@ -92,7 +92,7 @@ void CPUScheduler(virConnectPtr conn, int interval)
     double *cpuPercentage = calloc(pCpu, sizeof(double));
     while(1)
     {
-        getPercentage(domains, numDomains, cpuPercentage, domainToCpu, interval);
+        getPercentage(domains, numDomains, cpuPercentage, domainToCpu, pCpu, interval);
         for (int i = 0; i < pCpu; i++)
         {
             printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
