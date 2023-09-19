@@ -94,10 +94,6 @@ void CPUScheduler(virConnectPtr conn, int interval)
     while(1)
     {
         getPercentage(domains, numDomains, cpuPercentage, domainToCpu, pCpu, interval, domainPercentage);
-        for (int i = 0; i < pCpu; i++)
-        {
-            printf("CPU %d's usage is %f\n", i, cpuPercentage[i]);
-        }
         if (balanced(cpuPercentage, pCpu, domainToCpu, numDomains))
         {
             printf("Balanced!\n");
