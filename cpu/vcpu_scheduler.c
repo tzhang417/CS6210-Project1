@@ -129,7 +129,6 @@ void getPercentage(virDomainPtr *domains, int numDomains, double *cpuPercentage,
     {
         virVcpuInfo info;
         virDomainGetVcpus(domains[i], &info, 1, NULL, 0);
-        prevCpuTime[i] = info.cpuTime;
         cpuPercentage[domainToCpu[i]] += 100.0 * (info.cpuTime - prevCpuTime[i]) / (interval * 1000000000);
     }
 }
