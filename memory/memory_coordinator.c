@@ -80,7 +80,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	unsigned long long* availableMem = calloc(numDomains, sizeof(unsigned long long));
 	unsigned long long* balloonMem = calloc(numDomains, sizeof(unsigned long long));
 
-	virDomainMemoryStatStruct stats = calloc(VIR_DOMAIN_MEMORY_STAT_NR, sizeof(virDomainMemoryStatStruct));
+	virDomainMemoryStatStruct stats[VIR_DOMAIN_MEMORY_STAT_NR];
 	for (int i = 0; i < numDomains; i++)
 	{
 		int statsLength = virDomainMemoryStats(domains[i], stats, VIR_DOMAIN_MEMORY_STAT_NR, 0);
