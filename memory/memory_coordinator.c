@@ -66,9 +66,6 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 {
 	virNodeInfo nodeInfo;
     virDomainPtr *domains;
-	unsigned long long* unusedMem;
-	unsigned long long* availableMem;
-	unsigned long long* totalMem;
 	int low = 100;
 	int high = 300;
 
@@ -90,18 +87,18 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	{
 		virDomainMemoryStats(domains[i], unused, VIR_DOMAIN_MEMORY_STAT_UNUSED, 0);
 		virDomainMemoryStats(domains[i], available, VIR_DOMAIN_MEMORY_STAT_AVAILABLE, 0);
-		virDomainMemoryStats(domains[i], balloon, VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALOON, 0);
+		virDomainMemoryStats(domains[i], balloon, VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON, 0);
 		unusedMem[i] = unused[0].val / 1024;
 		availableMem[i] = available[0].val / 1024;
-		balloonMem[i] = baloon[0].val / 1024;
+		balloonMem[i] = balloon[0].val / 1024;
 		printf("Domain %d: unused %lld; available %lld; actual balloon %lld\n", i, unusedMem[i], availableMem[i], balloonMem[i]);
 	}
 
 	for (int i = 0; i < numDomains; i++)
 	{
-		if (unusedMem[i] < low * 1024 or unusedMem[i] > hi * 1024)
+		if (unusedMem[i] < low * 1024) or (unusedMem[i] > hi * 1024)
 		{
-			virDomainSetMemory(domainIds[i], (balloonMem[i] - avaliableMem[i] + (low + high) / 2 ) * 1024);
+			virDomainSetMemory(domains[i], (balloonMem[i] - availableMem[i] + (low + high) / 2 ) * 1024);
 		}
 	}
 }
