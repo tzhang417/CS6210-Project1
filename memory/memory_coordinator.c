@@ -64,5 +64,45 @@ COMPLETE THE IMPLEMENTATION
 */
 void MemoryScheduler(virConnectPtr conn, int interval)
 {
-	
+	virNodeInfo nodeInfo;
+    virDomainPtr *domains;
+	unsigned long long* unusedMem;
+	unsigned long long* availableMem;
+	unsigned long long* totalMem;
+	int low = 100;
+	int high = 300;
+
+    virNodeGetInfo(conn, &nodeInfo);
+    int pCpu = (int) nodeInfo.cpus;
+    printf("Number of pCpus: %d\n", pCpu);
+
+    int numDomains = virConnectListAllDomains(conn, &domains, VIR_CONNECT_LIST_DOMAINS_ACTIVE);
+    printf("Number of domains: %d\n", numDomains);
+
+	unsigned long long* unusedMem = calloc(numDomains, sizeof(unsigned long long));
+	unsigned long long* availableMem = calloc(numDomains, sizeof(unsigned long long));
+	unsigned long long* balloonMem = calloc(numDomains, sizeof(unsigned long long));
+
+	virDomainMemoryStatStruct unused[VIR_DOMAIN_MEMORY_STAT_UNUSED];
+	virDomainMemoryStatStruct available[VIR_DOMAIN_MEMORY_STAT_AVAILABLE];
+	virDomainMemoryStatStruct balloon[VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALOON];
+	for (int i = 0; i < numDomains; i++)
+	{
+		virDomainMemoryStats(domains[i], unused, VIR_DOMAIN_MEMORY_STAT_UNUSED, 0);
+		virDomainMemoryStats(domains[i], available, VIR_DOMAIN_MEMORY_STAT_AVAILABLE, 0);
+		virDomainMemoryStats(domains[i], balloon, VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALOON, 0);
+		unusedMem[i] = unused[0].val / 1024;
+		availableMem[i] = available[0].val / 1024;
+		balloonMem[i] = baloon[0].val / 1024;
+		printf("Domain %d: unused %lld; available %lld; actual balloon %lld\n", i, unusedMem[i], availableMem[i], balloonMem[i]);
+	}
+
+	for (int i = 0; i < numDomains; i++)
+	{
+		if (unusedMem[i] < low * 1024 or unusedMem[i] > hi * 1024)
+		{
+			virDomainSetMemory(domainIds[i], (balloonMem[i] - avaliableMem[i] + (low + high) / 2 ) * 1024);
+		}
+	}
 }
+
