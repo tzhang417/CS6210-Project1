@@ -80,17 +80,26 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	unsigned long long* availableMem = calloc(numDomains, sizeof(unsigned long long));
 	unsigned long long* balloonMem = calloc(numDomains, sizeof(unsigned long long));
 
-	virDomainMemoryStatStruct unused[VIR_DOMAIN_MEMORY_STAT_UNUSED];
-	virDomainMemoryStatStruct available[VIR_DOMAIN_MEMORY_STAT_AVAILABLE];
-	virDomainMemoryStatStruct balloon[VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON];
+	virDomainMemoryStatStruct stats = calloc(VIR_DOMAIN_MEMORY_STAT_NR, sizeof(virDomainMemoryStatStruct));;
 	for (int i = 0; i < numDomains; i++)
 	{
-		virDomainMemoryStats(domains[i], unused, VIR_DOMAIN_MEMORY_STAT_UNUSED, 0);
-		virDomainMemoryStats(domains[i], available, VIR_DOMAIN_MEMORY_STAT_AVAILABLE, 0);
-		virDomainMemoryStats(domains[i], balloon, VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON, 0);
-		unusedMem[i] = unused[0].val / 1024;
-		availableMem[i] = available[0].val / 1024;
-		balloonMem[i] = balloon[0].val / 1024;
+		int statsLength = virDomainMemoryStats(domains[i], stats, VIR_DOMAIN_MEMORY_STAT_NR, 0);
+		for (int j = 0; j < statsLength; j++)
+		{
+			stat = stats[j]
+			if (stat.tag == VIR_DOMAIN_MEMORY_STAT_UNUSED)
+			{
+				unusedMem[i] = stat.val / 1024;
+			}
+			else if (stat.tag == VIR_DOMAIN_MEMORY_STAT_AVAILABLE)
+			{
+				availableMem[i] = stat.val / 1024;
+			}
+			else if (stat.tag == VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON)
+			{
+				balloonMem[i] = stat.val / 1024;
+			}
+		}
 		printf("Domain %d: unused %lld; available %lld; actual balloon %lld\n", i, unusedMem[i], availableMem[i], balloonMem[i]);
 	}
 
