@@ -82,7 +82,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 
 	virDomainMemoryStatStruct unused[VIR_DOMAIN_MEMORY_STAT_UNUSED];
 	virDomainMemoryStatStruct available[VIR_DOMAIN_MEMORY_STAT_AVAILABLE];
-	virDomainMemoryStatStruct balloon[VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALOON];
+	virDomainMemoryStatStruct balloon[VIR_DOMAIN_MEMORY_STAT_ACTUAL_BALLOON];
 	for (int i = 0; i < numDomains; i++)
 	{
 		virDomainMemoryStats(domains[i], unused, VIR_DOMAIN_MEMORY_STAT_UNUSED, 0);
@@ -96,7 +96,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 
 	for (int i = 0; i < numDomains; i++)
 	{
-		if (unusedMem[i] < low * 1024) or (unusedMem[i] > hi * 1024)
+		if ((unusedMem[i] < low * 1024) or (unusedMem[i] > high * 1024))
 		{
 			virDomainSetMemory(domains[i], (balloonMem[i] - availableMem[i] + (low + high) / 2 ) * 1024);
 		}
