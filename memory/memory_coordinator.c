@@ -96,7 +96,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 
 	for (int i = 0; i < numDomains; i++)
 	{
-		if ((unusedMem[i] < low * 1024) or (unusedMem[i] > high * 1024))
+		if ((unusedMem[i] < low * 1024)or(unusedMem[i] > high * 1024))
 		{
 			virDomainSetMemory(domains[i], (balloonMem[i] - availableMem[i] + (low + high) / 2 ) * 1024);
 		}
