@@ -86,7 +86,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 		int statsLength = virDomainMemoryStats(domains[i], stats, VIR_DOMAIN_MEMORY_STAT_NR, 0);
 		for (int j = 0; j < statsLength; j++)
 		{
-			stat = stats[j]
+			virDomainMemoryStatStruct stat = stats[j];
 			if (stat.tag == VIR_DOMAIN_MEMORY_STAT_UNUSED)
 			{
 				unusedMem[i] = stat.val / 1024;
