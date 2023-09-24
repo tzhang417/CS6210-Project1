@@ -127,7 +127,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 				break;
 			}
 			printf("Give memory to domain %d\n", i);
-			virDomainSetMemory(domains[i], (balloonMem[i] - maxAllocateMem) * 1024);
+			virDomainSetMemory(domains[i], (balloonMem[i] + maxAllocateMem) * 1024);
 		}
 	}
 }
