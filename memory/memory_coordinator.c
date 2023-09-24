@@ -126,7 +126,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 				printf("Host doesn't have enough memory\n");
 				break;
 			}
-			int maxDomainMem = virDomainGetMaxMemory(domains[i]);
+			int maxDomainMem = virDomainGetMaxMemory(domains[i]) / 1024;
 			if (maxDomainMem < balloonMem[i] + maxAllocateMem)
 			{
 				printf("Domain %d reaches its max memory\n", i);
