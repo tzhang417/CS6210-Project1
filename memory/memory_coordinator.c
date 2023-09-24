@@ -119,7 +119,7 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	{
 		if (unusedMem[i] < low)
 		{
-			hostFreeMem = virNodeGetFreeMemory(conn) / (1024**2);
+			hostFreeMem = virNodeGetFreeMemory(conn) / (1024*1024);
 			printf("Host has free memory: %d\n", hostFreeMem);
 			if (hostFreeMem < minHostFreeMem)
 			{
