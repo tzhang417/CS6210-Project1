@@ -68,6 +68,8 @@ void MemoryScheduler(virConnectPtr conn, int interval)
     virDomainPtr *domains;
 	int low = 100;
 	int high = 300;
+	int maxAllocateMem = 100;
+	int minHostFreeMem = 200;
 
     virNodeGetInfo(conn, &nodeInfo);
     int pCpu = (int) nodeInfo.cpus;
@@ -107,15 +109,25 @@ void MemoryScheduler(virConnectPtr conn, int interval)
 	{
 		if (unusedMem[i] > high * 1024)
 		{
-			virDomainSetMemory(domains[i], (balloonMem[i] - availableMem[i] + (low + high) / 2 ) * 1024);
+			virDomainSetMemory(domains[i], (balloonMem[i] - maxAllocateMem) * 1024);
+			printf("Release memory from domain %d\n", i);
 		}
 	}
 
+	int hostFreeMem;
 	for (int i = 0; i < numDomains; i++)
 	{
 		if (unusedMem[i] < low * 1024)
 		{
-			virDomainSetMemory(domains[i], (balloonMem[i] - availableMem[i] + (low + high) / 2 ) * 1024);
+			hostFreeMem = virNodeGetFreeMemory(conn) / 1024;
+			printf("Host has free memory: %d\n", hostFreeMem);
+			if (hostFreeMem < minHostFreeMem)
+			{
+				printf("Host doesn't have enough memory\n");
+				break;
+			}
+			printf("Give memory to domain %d\n", i);
+			virDomainSetMemory(domains[i], (balloonMem[i] - maxAllocateMem) * 1024);
 		}
 	}
 }
