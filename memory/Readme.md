@@ -1,16 +1,19 @@
 
-## Project Instruction Updates:
+## Compile and Run
 
-1. Complete the function MemoryScheduler() in memory_coordinator.c
-2. If you are adding extra files, make sure to modify Makefile accordingly.
-3. Compile the code using the command `make all`
-4. You can run the code by `./memory_coordinator <interval>`
+1. Compile the code using the command `make -f Makefile`
+2. You can run the code by `./memory_coordinator <interval>`
 
-### Notes:
+### Algorithm:
 
-1. Make sure that the VMs and the host has sufficient memory after any release of memory.
-2. Memory should be released gradually. For example, if VM has 300 MB of memory, do not release 200 MB of memory at one-go.
-3. Domain should not release memory if it has less than or equal to 100MB of unused memory.
-4. Host should not release memory if it has less than or equal to 200MB of unused memory.
-5. While submitting, write your algorithm and logic in this Readme.
+In each iteration:
+1. Use `virDomainMemoryStats` to obtain each domain's available memory, unused memory, and actual ballon memory.
+2. Release memories from domains that have unused memory more than the maximum unused threshold.
+3. Give memories to domains that have unused memory less than the maximum used threshold.
+
+### Note:
+1. Release memories before give memories to allow giving more memory to designated domains.
+2. When releasing or giving memories, only give 100mb each time.
+3. If the host machine has less than 100mb, refuse to give more memories to guest machines.
+4. If a guest machine is requiring more memory and will have more memory than its max limit, refuse to give this machine more memories.
 
